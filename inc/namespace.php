@@ -36,7 +36,7 @@ function filter_presentation( Abstract_Presentation $presentation ) : Abstract_P
         return $presentation;
     }
 
-    if ( ! post_type_supports( $presentation->context->indexable->object_subtype, 'author' ) ) {
+    if ( ! post_type_supports( $presentation->context->indexable->object_sub_type, 'author' ) ) {
         return $presentation;
     }
 
@@ -83,7 +83,7 @@ function filter_frontend_presenters( array $presenters, Meta_Tags_Context $conte
         return $presenters;
     }
 
-    if ( ! post_type_supports( $context->indexable->object_subtype, 'author' ) ) {
+    if ( ! post_type_supports( $context->indexable->object_sub_type, 'author' ) ) {
         return $presenters;
     }
 
@@ -118,7 +118,7 @@ function filter_schema_graph_pieces( array $pieces, Meta_Tags_Context $context )
         return $pieces;
     }
 
-    if ( ! post_type_supports( $context->indexable->object_subtype, 'author' ) ) {
+    if ( ! post_type_supports( $context->indexable->object_sub_type, 'author' ) ) {
         return $pieces;
     }
 

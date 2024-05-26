@@ -18,6 +18,12 @@ Alternatively, you can install the plugin using Composer by following these step
 4. Once the installation is complete, activate the plugin through the WordPress admin dashboard.
 
 
+## FAQ
+
+### No authors are output
+
+Yoast SEO only outputs author data for post types with an Article schema type configured. You need to set the article schema type in the Yoast SEO Settings admin page, under the content types section.
+
 ## Usage
 Works out of the box with Yoast SEO. No configuration is required.
 
