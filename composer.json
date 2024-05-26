@@ -1,0 +1,13 @@
+{
+    "name": "humanmade/authorship-yoast",
+    "description": "Yoast SEO compatibility layer for the Authorship plugin",
+    "type": "wordpress-plugin",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Human Made",
+            "email": "hello@humanmade.com"
+        }
+    ],
+    "require": {}
+}
