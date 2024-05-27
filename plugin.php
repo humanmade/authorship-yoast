@@ -3,7 +3,7 @@
  * Plugin Name: Authorship for Yoast SEO
  * Plugin URI: https://github.com/humanmade/authorship-yoast
  * Description: Yoast SEO Compatibility for the Authorship plugin
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Human Made Limited
  * Author URI: https://humanmade.com
  * License: GPL-2.0+
