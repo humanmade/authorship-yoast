@@ -6,6 +6,7 @@
 namespace Authorship\Yoast;
 
 use Authorship;
+use WP_Post;
 use WP_User_Query;
 use Yoast\WP\SEO\Context\Meta_Tags_Context;
 use Yoast\WP\SEO\Generators\Schema;
@@ -44,14 +45,23 @@ function filter_presentation( Abstract_Presentation $presentation ) : Abstract_P
 		return $presentation;
 	}
 
-	$authors = Authorship\get_authors( get_post( $presentation->context->indexable->object_id ) );
+	$post = get_post( $presentation->context->indexable->object_id );
+	if ( ! $post instanceof WP_Post ) {
+		return $presentation;
+	}
+
+	// Leave Yoast's default post_author output in place when there are no Authorship authors.
+	$authors = Authorship\get_authors( $post );
+	if ( empty( $authors ) ) {
+		return $presentation;
+	}
 
 	// Replace every instance of the author ID with the first author ID.
 	// Yoast uses the different objects very inconsistently so need to cover bases.
-	$presentation->model->author_id = $authors[0]->ID ?? 0;
-	$presentation->context->indexable->author_id = $authors[0]->ID ?? 0;
-	$presentation->context->post->post_author = $authors[0]->ID ?? 0;
-	$presentation->source->post_author = $authors[0]->ID ?? 0;
+	$presentation->model->author_id = $authors[0]->ID;
+	$presentation->context->indexable->author_id = $authors[0]->ID;
+	$presentation->context->post->post_author = $authors[0]->ID;
+	$presentation->source->post_author = $authors[0]->ID;
 
 	// Add all authors to the model to make it available to presenters.
 	$presentation->model->authors = $authors;
@@ -67,8 +77,13 @@ function filter_presentation( Abstract_Presentation $presentation ) : Abstract_P
  * @return array
  */
 function filter_enhanced_slack_data( $data, Abstract_Presentation $presentation ) : array {
+	// Keep Yoast's default "Written by" value when there are no Authorship authors.
+	if ( empty( $presentation->model->authors ) ) {
+		return $data;
+	}
+
 	if ( isset( $data[ __( 'Written by', 'wordpress-seo' ) ] ) ) {
-		$authors = wp_list_pluck( $presentation->model->authors ?? [], 'display_name' );
+		$authors = wp_list_pluck( $presentation->model->authors, 'display_name' );
 		$data[ __( 'Written by', 'wordpress-seo' ) ] = wp_sprintf_l( '%l', $authors );
 	}
 
@@ -91,8 +106,13 @@ function filter_frontend_presenters( array $presenters, Meta_Tags_Context $conte
 		return $presenters;
 	}
 
+	$post = get_post( $context->indexable->object_id );
+	if ( ! $post instanceof WP_Post ) {
+		return $presenters;
+	}
+
 	// Retrieve the authors for the post.
-	$authors = Authorship\get_authors( get_post( $context->indexable->object_id ) );
+	$authors = Authorship\get_authors( $post );
 	if ( empty( $authors ) ) {
 		return $presenters;
 	}
@@ -126,16 +146,21 @@ function filter_schema_graph_pieces( array $pieces, Meta_Tags_Context $context )
 		return $pieces;
 	}
 
+	$post = get_post( $context->indexable->object_id );
+	if ( ! $post instanceof WP_Post ) {
+		return $pieces;
+	}
+
+	// Retrieve the authors for the post. Keep the default author piece when there are none.
+	$authors = Authorship\get_authors( $post );
+	if ( empty( $authors ) ) {
+		return $pieces;
+	}
+
 	// Remove default author piece.
 	$pieces = array_filter( $pieces, function( $piece ) {
 		return ! $piece instanceof Schema\Author;
 	} );
-
-	// Retrieve the authors for the post.
-	$authors = Authorship\get_authors( get_post( $context->indexable->object_id ) );
-	if ( empty( $authors ) ) {
-		return $pieces;
-	}
 
 	// Add authorship author pieces.
 	foreach ( $authors as $author ) {
